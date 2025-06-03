@@ -25,28 +25,8 @@ def search():
 
 # ============================================== Get youtube video link from the video id
 @app.route('/audio_url')
-# def get_audio_url():
-#     video_id = request.args.get('id')
-#     if not video_id:
-#         return jsonify({"error":"Missing 'id' in parameter"}), 400
-    
-#     url = f"https://www.youtube.com/watch?v={video_id}"
-#     ydl_opts = {
-#         'format': 'bestaudio/best',
-#         'quiet': True,
-#         'skip_download': True,
-#         'forceurl': True,
-#     }
-
-#     try:
-#         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-#             info_dict = ydl.extract_info(url, download=False)
-#             audio_url = info_dict['url']
-#             return jsonify({'audio_url': audio_url})
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
-    
-def get_audio_url(video_id):
+def get_audio_url():
+    video_id = request.args.get('id')
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     # Get cookies from Brave browser
