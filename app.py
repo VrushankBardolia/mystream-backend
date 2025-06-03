@@ -58,7 +58,13 @@ def stream_audio():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             stream_url = info.get('url')
-            ext = info.get('ext', 'audio/mp4')  # fallback to audio/mp4
+            ext = info.get('ext')
+            content_type = {
+                'm4a': 'audio/mp4',
+                'mp3': 'audio/mpeg',
+                'webm': 'audio/webm'
+            }.get(ext, 'audio/mp4')
+
     except Exception as e:
         return f"yt-dlp error: {str(e)}", 500
 
@@ -72,7 +78,7 @@ def stream_audio():
                 if chunk:
                     yield chunk
 
-    return Response(generate(), content_type=f'audio/{ext}')
+    return Response(generate(), content_type=content_type)
     
 if __name__ == '__main__':
     import os
