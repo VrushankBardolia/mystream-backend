@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ytmusicapi import YTMusic
 import yt_dlp
-import browser_cookie3
 
 app = Flask(__name__)
 CORS(app)
@@ -29,22 +28,17 @@ def get_audio_url():
     video_id = request.args.get('id')
     url = f"https://www.youtube.com/watch?v={video_id}"
 
-    # Get cookies from Brave browser
-    cj = browser_cookie3.brave()
-
     ydl_opts = {
         'format': 'bestaudio/best',
         'quiet': True,
         'noplaylist': True,
-        'cookiefile': None,
-        'cookiejar': cj  # Pass the cookie jar directly
+        'cookiefile': 'cookies.txt',  # Use your cookies.txt file here
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
-        return info['url']
+        return jsonify({"audio_url": info['url']})
     
-
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
