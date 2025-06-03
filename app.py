@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from ytmusicapi import YTMusic
-from yt_dlp import YoutubeDL
+import yt_dlp
 import browser_cookie3
 
 app = Flask(__name__)
@@ -60,6 +60,6 @@ def get_audio_url(video_id):
         'cookiejar': cj  # Pass the cookie jar directly
     }
 
-    with YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
         return info['url']
