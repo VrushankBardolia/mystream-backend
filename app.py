@@ -49,22 +49,17 @@ def search():
 def get_audio_url(video_id):
     url = f"https://www.youtube.com/watch?v={video_id}"
 
+    # Get cookies from Brave browser
+    cj = browser_cookie3.brave()
+
     ydl_opts = {
         'format': 'bestaudio/best',
         'quiet': True,
         'noplaylist': True,
-        'cookiefile': None,  # Not using a manual file
-        'cookiesfrombrowser': ('chrome',),  # Use Chrome cookies
+        'cookiefile': None,
+        'cookiejar': cj  # Pass the cookie jar directly
     }
 
-    # Provide browser cookies (automatically)
-    cj = browser_cookie3.chrome()
-
-    with YoutubeDL({**ydl_opts, 'cookiefile': cj}) as ydl:
+    with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
         return info['url']
-
-if __name__ == "__main__":
-    from os import environ
-    port = int(environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
