@@ -48,8 +48,8 @@ def stream_audio():
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     ydl_opts = {
-        'format': 'bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio',
-        'cookiefile': 'cookies.txt',  # Only use this if needed
+        'format': 'bestaudio[ext=m4a]/bestaudio',
+        'cookiefile': 'cookies.txt',
         'quiet': True,
         'noplaylist': True,
     }
@@ -58,27 +58,13 @@ def stream_audio():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             stream_url = info.get('url')
-            ext = info.get('ext')
-            content_type = {
-                'm4a': 'audio/mp4',
-                'mp3': 'audio/mpeg',
-                'webm': 'audio/webm'
-            }.get(ext, 'audio/mp4')
-
     except Exception as e:
         return f"yt-dlp error: {str(e)}", 500
 
     if not stream_url:
         return "Unable to get stream URL", 500
 
-    def generate():
-        with requests.get(stream_url, stream=True) as r:
-            r.raise_for_status()
-            for chunk in r.iter_content(chunk_size=4096):
-                if chunk:
-                    yield chunk
-
-    return Response(generate(), content_type=content_type)
+    return jsonify({'stream_url': stream_url})
     
 if __name__ == '__main__':
     import os
