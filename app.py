@@ -42,28 +42,37 @@ def search():
 @app.route('/stream')
 def stream_audio():
     video_id = request.args.get('id')
+    if not video_id:
+        return "Missing video ID", 400
+
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     ydl_opts = {
-        'format': 'bestaudio[ext=webm]/bestaudio/best',
-        'cookies_from_browser': ('brave',),
+        'format': 'bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio',
+        'cookiefile': 'cookies.txt',  # Only use this if needed
         'quiet': True,
         'noplaylist': True,
-        'cookiefile': 'cookies.txt',
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        stream_url = info['url']
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            stream_url = info.get('url')
+            ext = info.get('ext', 'audio/mp4')  # fallback to audio/mp4
+    except Exception as e:
+        return f"yt-dlp error: {str(e)}", 500
 
-    # Now proxy the stream from YouTube
+    if not stream_url:
+        return "Unable to get stream URL", 500
+
     def generate():
         with requests.get(stream_url, stream=True) as r:
+            r.raise_for_status()
             for chunk in r.iter_content(chunk_size=4096):
                 if chunk:
                     yield chunk
 
-    return Response(generate(), content_type='audio/webm')
+    return Response(generate(), content_type=f'audio/{ext}')
     
 if __name__ == '__main__':
     import os
