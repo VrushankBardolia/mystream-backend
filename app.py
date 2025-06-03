@@ -46,6 +46,7 @@ def stream_audio():
 
     ydl_opts = {
         'format': 'bestaudio[ext=webm]/bestaudio/best',
+        'cookies_from_browser': ('brave',),
         'quiet': True,
         'noplaylist': True,
         'cookiefile': 'cookies.txt',
